@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Добавить рецепт</h2>
+
+{% if error %}
+    <p class="error"> {{ error }} </p>
+{% endif %}
+
+<form action="{{ url_for('add_recipe') }}" method="POST">
+    <label for="name">Название рецепта:</label>
+    <input type="text" id="name" name="name" required value="{{ recipe.name }}">
+
+    <label for="category">Категория:</label>
+    <input type="text" id="category" name="category" value="{{ recipe.category }}">
+
+    <label for="description">Описание:</label>
+    <textarea id="description" name="description">{{ recipe.description }}</textarea>
+
+    <label for="prep_time">Время приготовления (мин):</label>
+    <input type="number" id="prep_time" name="prep_time" value="{{ recipe.prep_time }}">
+
+    <label for="instructions">Инструкции:</label>
+    <textarea id="instructions" name="instructions">{{ recipe.instructions }}</textarea>
+
+    <button type="submit">Добавить рецепт</button>
+</form>
+
+{% endblock %}

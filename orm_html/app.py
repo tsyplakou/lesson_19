@@ -16,7 +16,10 @@ def validate_string(val):
 
 
 def validate_prep_time(val):
-    return isinstance(val, int) and 0 < val < 999
+    return (
+        (isinstance(val, int) and 0 < val < 999) or
+        (isinstance(val, str) and val.isnumeric() and 0 < int(val) < 999)
+    )
 
 
 def recipe_to_dict(recipe):
@@ -179,6 +182,41 @@ def recipe_detail(recipe_id):
             recipe=recipe,
             comments=comments,
         )
+
+
+@app.route('/recipes/add', methods=['GET', 'POST'])
+def add_recipe():
+    if request.method == 'GET':
+        return render_template('add_recipe.html', recipe={})
+    elif request.method == 'POST':
+        if not request.form or not all(
+            key in request.form for key in RECIPE_REQUIRED_FIELDS
+        ):
+            return {'error': 'All required fields are required'}, 400
+
+        if set(RECIPE_REQUIRED_FIELDS) - set(request.form):
+            return render_template(
+                'add_recipe.html',
+                error='Something is wrong!',
+                recipe=request.form,
+            )
+
+        for key in RECIPE_REQUIRED_FIELDS:
+            if not RECIPE_REQUIRED_FIELDS[key](request.form[key]):
+                return render_template(
+                    'add_recipe.html',
+                    error=f'{key} is invalid',
+                    recipe=request.form,
+                )
+
+        with get_session() as session:
+            recipe = Recipe(**request.form)
+            session.add(recipe)
+            session.commit()
+
+            return redirect(
+                url_for('recipe_detail', recipe_id=recipe.id)
+            )
 
 
 @app.route('/recipes/<int:recipe_id>/comments', methods=['POST'])
