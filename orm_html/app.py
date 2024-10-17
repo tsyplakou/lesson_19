@@ -47,7 +47,7 @@ RECIPE_REQUIRED_FIELDS = {
 ORDERING_QUERY_KEY = 'ordering'
 
 
-@app.route('/')
+@app.route('/api')
 def redirect_to_recipes():
     return redirect(url_for('recipes'))
 
@@ -55,7 +55,7 @@ def redirect_to_recipes():
 # /recipes GET/POST ?filtering&sorting
 # /recipes/<id> GET/PUT/PATCH/DELETE
 
-@app.route('/recipes', methods=['GET', 'POST'])
+@app.route('/api/recipes', methods=['GET', 'POST'])
 def recipes():
     if request.method == 'GET':
         # sorting
@@ -108,7 +108,7 @@ def recipes():
 
 
 @app.route(
-    '/recipes/<int:recipe_id>/',
+    '/api/recipes/<int:recipe_id>/',
     methods=['GET', 'PUT', 'PATCH', 'DELETE'],
 )
 def recipe(recipe_id):
