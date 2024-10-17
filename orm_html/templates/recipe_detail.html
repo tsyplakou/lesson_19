@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ recipe.name }}</h2>
+<p><strong>Категория:</strong> {{ recipe.category }}</p>
+<p><strong>Описание:</strong> {{ recipe.description }}</p>
+<p><strong>Время приготовления:</strong> {{ recipe.prep_time }} мин</p>
+<p><strong>Инструкции:</strong></p>
+<p>{{ recipe.instructions }}</p>
+
+<h3>Комментарии</h3>
+<ul>
+    {% for comment in comments %}
+    <li>{{ comment.content }} — {{ comment.created_at }}</li>
+    {% endfor %}
+</ul>
+
+<form action="{{ url_for('add_comment', recipe_id=recipe.id) }}" method="POST">
+    <textarea name="content" placeholder="Оставьте комментарий..."></textarea>
+    <button type="submit">Добавить комментарий</button>
+</form>
+
+{% endblock %}

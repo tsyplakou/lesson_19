@@ -153,5 +153,49 @@ def recipe(recipe_id):
             return {'message': 'Recipe deleted successfully'}, 204
 
 
+@app.route('/')
+def index():
+    with get_session() as session:
+        recipes = session.query(Recipe).all()
+
+        return render_template(
+            'index.html',
+            recipes=recipes,
+        )
+
+
+@app.route('/recipes/<int:recipe_id>/')
+def recipe_detail(recipe_id):
+    with get_session() as session:
+        try:
+            recipe = session.query(Recipe).filter_by(id=recipe_id).one()
+        except NoResultFound:
+            return render_template('404.html'), 404
+
+        comments = session.query(Comment).filter_by(recipe_id=recipe_id)
+
+        return render_template(
+           'recipe_detail.html',
+            recipe=recipe,
+            comments=comments,
+        )
+
+
+@app.route('/recipes/<int:recipe_id>/comments', methods=['POST'])
+def add_comment(recipe_id):
+    if not request.form or 'content' not in request.form:
+        return {'error': 'Content is required'}, 400
+
+    with get_session() as session:
+        comment = Comment(
+            recipe_id=recipe_id,
+            content=request.form['content'],
+        )
+        session.add(comment)
+        session.commit()
+
+    return redirect(url_for('recipe_detail', recipe_id=recipe_id))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
